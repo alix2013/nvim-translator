@@ -1,13 +1,13 @@
--- Author: alix_an@hotmail.com
+-- Author: alix
+-- Email: alix_an@hotmail.com
 -- Description: neovim language translator plugin
 --
 local M = {}
 M.option = {
-  -- https_proxy = "",
-  style = "float",  -- bottom, right or float, float is default
+  style = "float",  -- vertical, horizontal or float, float is default
   https_proxy = "", -- https_proxy default is "", not use proxy
 
-  -- keymap for virual mode default keymap, i.e selected lines in visual mode, then press tc convert to Chinese
+  -- keymap for visual mode default keymap, i.e selected lines in visual mode, then press tc convert to Chinese
   keymap = {
     ["tc"] = "zh-cn",
     ["te"] = "en",
@@ -16,6 +16,7 @@ M.option = {
     ["tk"] = "ko",
     ["tj"] = "ja",
   },
+
   language = {
     ['af'] = 'afrikaans',
     ['sq'] = 'albanian',
@@ -175,7 +176,6 @@ function M._translate_text(stringTable, dest)
   end
 
   local srcFileName = M._writeToFile(stringTable)
-  -- print(vim.inspect(contents))
 
   local transExecFile = M._genTransExec()
   local env = ''
@@ -184,10 +184,6 @@ function M._translate_text(stringTable, dest)
   end
 
   local command = env .. "python3 " .. transExecFile .. " " .. srcFileName .. " " .. dest
-
-  -- local handle = assert(io.popen(command))
-  -- local output = handle:read("*a")
-  -- handle:close()
 
   local file = io.popen(command)
   local lines = {}
@@ -202,15 +198,6 @@ function M._translate_text(stringTable, dest)
     print("Translate failed")
   end
 
-  -- -- convert text to stringTable, drop \n
-  -- local lines = {}
-  -- for line in string.gmatch(output, "[^\n]+") do
-  --   table.insert(lines, line)
-  -- end
-  -- -- print(vim.inspect(lines))
-  -- -- remove temp files
-  -- os.remove(srcFileName)
-  -- os.remove(transExecFile)
   return lines
 end
 
@@ -247,11 +234,11 @@ function M._show(text)
     M._showAsFloat(text)
   end
 
-  if M.option.style == "bottom" then
+  if M.option.style == "horizontal" then
     M._showAtBottom(text)
   end
 
-  if M.option.style == "right" then
+  if M.option.style == "vertical" then
     M._showAtRight(text)
   end
 end
@@ -348,7 +335,6 @@ function TranslateTo(dest_lang)
     return
   end
 
-  -- print(vim.inspect(range))
   local last_visual_mode = vim.fn.visualmode(true)
   local lines = {}
 
@@ -360,18 +346,12 @@ function TranslateTo(dest_lang)
     lines = vim.api.nvim_buf_get_lines(current_bufnr, 0, -1, false)
   end
 
-  -- print("print lines", vim.inspect(lines))
   local translated_text = M._translate_text(lines, dest_lang)
 
-  -- M._translateThenShow(lines, dest_lang)
   M._show(translated_text)
 end
 
 function M._setupKeymap()
-  -- vim.api.nvim_set_keymap('v', 'tc', ':lua require("nvim-translator").translateSelectedTextTo("zh-cn")<CR>',
-  --   { noremap = true, silent = true })
-  -- vim.api.nvim_set_keymap('v', 'te', ':lua require("nvim-translator").translateSelectedTextTo("en")<CR>',
-  --   { noremap = true, silent = true })
   local opt = { noremap = true, silent = true }
   for key, value in pairs(M.option.keymap) do
     local cmd = string.format(':lua require("nvim-translator").translateSelectedTextTo("%s")<CR>', value)
@@ -393,13 +373,22 @@ function M.setup(...)
     end
 
     if option.style ~= nil then
-      M.option.style = option.style
+      if (string.sub(string.upper(option.style), 1, 3) == "FLO") then --float
+        M.option.style = "float"
+      end
+
+      if (string.sub(string.upper(option.style), 1, 3) == "VER") then --float
+        M.option.style = "vertical"
+      end
+
+      if (string.sub(string.upper(option.style), 1, 3) == "HOR") then --float
+        M.option.style = "horizontal"
+      end
     end
 
     if option.keymap ~= nil then
       M.option.keymap = option.keymap
     end
-    -- print(M.option)
   end
   M._setupKeymap()
 end
