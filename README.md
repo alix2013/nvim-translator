@@ -7,8 +7,8 @@ A language translator for neovim written in Lua
 
 - python3
 
-- googletrans
-install python3 library, i.e:
+- python3 googletrans library
+
 
 ```shell
 pip3 install googletrans==4.0.0rc1

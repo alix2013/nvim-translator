@@ -368,13 +368,13 @@ function TranslateTo(dest_lang)
 end
 
 function M._setupKeymap()
-  -- vim.api.nvim_set_keymap('v', 'tc', ':lua require("translator").translateSelectedTextTo("zh-cn")<CR>',
+  -- vim.api.nvim_set_keymap('v', 'tc', ':lua require("nvim-translator").translateSelectedTextTo("zh-cn")<CR>',
   --   { noremap = true, silent = true })
-  -- vim.api.nvim_set_keymap('v', 'te', ':lua require("translator").translateSelectedTextTo("en")<CR>',
+  -- vim.api.nvim_set_keymap('v', 'te', ':lua require("nvim-translator").translateSelectedTextTo("en")<CR>',
   --   { noremap = true, silent = true })
   local opt = { noremap = true, silent = true }
   for key, value in pairs(M.option.keymap) do
-    local cmd = string.format(':lua require("translator").translateSelectedTextTo("%s")<CR>', value)
+    local cmd = string.format(':lua require("nvim-translator").translateSelectedTextTo("%s")<CR>', value)
     vim.api.nvim_set_keymap('v', key, cmd, opt)
   end
   -- set command :Translate lang
