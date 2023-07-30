@@ -262,29 +262,33 @@ function M._showAsFloat(translated_text)
     border = "single",
     row = 1,
     col = 0,
-    focusable = false,
+    -- focusable = false,
+    style = 'minimal'
   })
-
-  -- vim.api.nvim_win_set_option(win_id, 'cursorline', true)
-  -- vim.api.nvim_win_set_option(win_id, 'cursorcolumn', true)
-  -- vim.api.nvim_win_set_option(win_id, 'wrap', false)
-  -- vim.api.nvim_win_set_option(win_id, 'foldenable', false)
-  -- vim.api.nvim_win_set_option(win_id, 'scrolloff', 0)
-  vim.api.nvim_win_set_option(win_id, 'number', false)
-  --
-  -- Set the buffer options
-  vim.api.nvim_buf_set_option(bufnr, 'bufhidden', 'wipe')
 
   -- Map 'q' key to close the window
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'q', ':q<CR>', { noremap = true, silent = true })
   -- Map Esc to close the window
   -- vim.api.nvim_buf_set_keymap(bufnr, 'i', '<Esc>', '<C-\\><C-n>:pclose<CR>', { noremap = true, silent = true })
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<Esc>', ':q<CR>', { noremap = true, silent = true })
+  vim.api.nvim_buf_set_keymap(bufnr, 'i', '<Esc>',
+    '<Cmd>lua require("nvim-translator")._closeFloatingWindow(' .. win_id .. ')<CR>', { noremap = true, silent = true })
 
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<Esc>', ':q<CR>', { noremap = true, silent = true })
   -- avoid ctrl-q to switch to other window
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-q>', '<Nop>', { nowait = true })
   vim.api.nvim_buf_set_keymap(bufnr, 'i', '<C-q>', '<Nop>', { nowait = true })
   vim.api.nvim_buf_set_keymap(bufnr, 't', '<C-q>', '<Nop>', { nowait = true })
+
+  -- vim.cmd('autocmd WinLeave <buffer=' .. bufnr .. '> lua require('nvim-translator)._closeFloatingWindow()')
+  vim.cmd('autocmd WinLeave <buffer=' ..
+    bufnr .. '> lua require("nvim-translator")._closeFloatingWindow(' .. win_id .. ')')
+end
+
+function M._closeFloatingWindow(winid)
+  if vim.api.nvim_win_is_valid(winid) then
+    -- Close the floating window
+    vim.api.nvim_win_close(winid, true)
+  end
 end
 
 function M._showAtBottom(translated_text)
@@ -338,13 +342,23 @@ function TranslateTo(dest_lang)
   local last_visual_mode = vim.fn.visualmode(true)
   local lines = {}
 
-  --if at visual mode get selected text else get all lines of current buffer
+  -- if at visual mode get selected text else get all lines of current buffer
   if last_visual_mode == 'v' or last_visual_mode == 'V' then
     lines = vim.fn.getline("'<", "'>")
   else
     local current_bufnr = vim.api.nvim_get_current_buf()
     lines = vim.api.nvim_buf_get_lines(current_bufnr, 0, -1, false)
   end
+
+  -- local current_mode = vim.api.nvim_get_mode().mode
+  -- if current_mode ~= 'v' or current_mode ~= 'V' then
+  --   vim.api.nvim_feedkeys('gv', 'n', false)
+  -- end
+  -- local lines = vim.fn.getline("'<", "'>")
+  -- if #lines == 0 then
+  --   local current_bufnr = vim.api.nvim_get_current_buf()
+  --   lines = vim.api.nvim_buf_get_lines(current_bufnr, 0, -1, false)
+  -- end
 
   local translated_text = M._translate_text(lines, dest_lang)
 

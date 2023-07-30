@@ -1,5 +1,6 @@
 # nvim-translator
 A language translator for neovim written in Lua
+![nvim-translator](nvim-translator.gif "Neovim translator demo")
 
 ## Requirements
 
@@ -99,7 +100,8 @@ where to show the translated text, available value: "float", "horizontal", "vert
 
 
 ### https_proxy
-Configure proxy if network can not access internet directly, default is ""
+Configure proxy if network can not access internet directly, default is "", it
+may use current shell environment HTTPS_PROXY if not configure this option
 
 ### keymap 
 Configure visual mode keymap to translate selected text to destination
