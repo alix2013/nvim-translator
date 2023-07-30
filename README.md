@@ -12,23 +12,17 @@ A language translator for neovim written in Lua
 pip3 install googletrans==4.0.0rc1
 ```
 
-## Installation 
+## Install 
 
-### lazy as plugin manager
-- Use default configuration 
-```shell
-
-{
-    "alix2013/nvim-translator",
-    config = function()
-        require("nvim-translator").setup({ })
-    end
-}
+### install with default configuration 
 
 ```
+    "alix2013/nvim-translator"
 
-- Customized configuration
+```
+## Customized configuration example
 
+### Use "lazy" as plugin manager
 ```shell
 
   {
@@ -50,21 +44,7 @@ pip3 install googletrans==4.0.0rc1
 
 ```
 
-### packer as plugin manager
-- Use default configuration
-
-```shell
-
-use({
-    "alix2013/nvim-translator",
-    config = function()
-        require("nvim-translator").setup({ })
-    end
-})
-
-```
-
-- Customized configuration
+### Use packer as plugin manager
 
 ```shell
 
