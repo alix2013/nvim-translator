@@ -108,6 +108,7 @@ language, the following is default configuration, add new item as per requiremen
 - Press V to go to visual mode
 - Move cursor to select lines
 - Press :Translate <language abbreviation>, i.e :Translate zh-cn, translate selected text to Chinese
+- Press :Translate, not specify any language, it will popup language select window if Telescope plugin installed, select language then press enter
 
 If no text selected, it will translate all text in current buffer window.
 

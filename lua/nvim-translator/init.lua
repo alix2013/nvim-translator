@@ -329,25 +329,48 @@ function M._isSupportedLanguage(lang)
   end
 end
 
-function TranslateTo(dest_lang)
-  if dest_lang == nil or dest_lang == '' then
-    print("Not specify destination language")
-    return
-  end
-  if not M._isSupportedLanguage(dest_lang) then
-    print(dest_lang .. " language is not supported!")
-    return
+function M._showpicker_translate(lines)
+  local lang_map = M.option.language
+  local lang_list = {}
+  for key, value in pairs(lang_map) do
+    table.insert(lang_list, key .. " = " .. value)
   end
 
+  local picker = require('nvim-translator.picker')
+
+  picker.select(lang_list, function(selected)
+    -- extract selected language before "-"
+    local lang_str = string.match(selected, "(.-)%s*=")
+    -- print("picker selected", lang_str)
+    local translated_text = M._translate_text(lines, lang_str)
+    M._show(translated_text)
+  end)
+end
+
+function TranslateTo(dest_lang)
   local last_visual_mode = vim.fn.visualmode(true)
   local lines = {}
-
   -- if at visual mode get selected text else get all lines of current buffer
   if last_visual_mode == 'v' or last_visual_mode == 'V' then
     lines = vim.fn.getline("'<", "'>")
   else
     local current_bufnr = vim.api.nvim_get_current_buf()
     lines = vim.api.nvim_buf_get_lines(current_bufnr, 0, -1, false)
+  end
+
+  if dest_lang == nil or dest_lang == '' then
+    local ok, _ = pcall(require, "telescope")
+    if not ok then
+      print("Not specify destination language or telescope.nvim not installed")
+      return
+    end
+    M._showpicker_translate(lines)
+    return
+  end
+
+  if not M._isSupportedLanguage(dest_lang) then
+    print(dest_lang .. " language is not supported!")
+    return
   end
 
   -- local current_mode = vim.api.nvim_get_mode().mode
